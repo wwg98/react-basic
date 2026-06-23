@@ -1,8 +1,15 @@
 //Myheader 컴포넌트
-function Myheader({ title, desc }) {
+function Myheader({ title, desc, onChangeMode }) {
+  console.log("Myheader render");
   return (
     <header>
-      <h1 className="logo">{title}</h1>
+      <h1
+        className="logo"
+        onClick={() => {
+          onChangeMode();
+        }}>
+        {title}
+      </h1>
       <p>{desc}</p>
     </header>
   );
