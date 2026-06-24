@@ -2,6 +2,8 @@ import "./App.css";
 import Myheader from "./components/Myheader";
 import Nav from "./components/Nav";
 import MyArticle from "./components/MyArticle";
+import Controls from "./components/controls";
+import CreateArticle from "./components/createArticle";
 import { useState } from "react";
 
 function App() {
@@ -12,7 +14,6 @@ function App() {
     title: "프론트엔드 개발자",
     desc: "기본언어인 html, css, javascript부터 학습합니다.",
   });
-
   const [content, setContent] = useState([
     { id: 1, title: "UI/UX 개발", desc: "사용자 경험을 고려한 직관적이고 반응성 높은 화면 구현" },
     {
@@ -26,21 +27,25 @@ function App() {
       desc: "상태 변화에 따른 자연스럽고 동적인 화면 효과 구현",
     },
   ]);
-
   const welcome = { title: "welcome", desc: "Welcome to react" };
 
   let _title = null;
   let _desc = null;
+  let _article = null;
 
   if (mode === "welcome") {
     _title = welcome.title;
     _desc = welcome.desc;
+    _article = <MyArticle title={_title} desc={_desc} />;
   } else if (mode === "read") {
     const selected = content.find(c => c.id === id);
     if (selected) {
       _title = selected.title;
       _desc = selected.desc;
+      _article = <MyArticle title={_title} desc={_desc} />;
     }
+  } else if (mode === "create") {
+    _article = <CreateArticle />;
   }
   return (
     <>
@@ -58,7 +63,13 @@ function App() {
           setId(_id);
         }}
       />
-      <MyArticle title={_title} desc={_desc} />
+      {_article}
+      <hr />
+      <Controls
+        onChangeMode={() => {
+          setMode("create");
+        }}
+      />
     </>
   );
 }
