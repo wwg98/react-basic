@@ -1,10 +1,10 @@
+import { useState, useCallback } from "react";
 import "./App.css";
 import Myheader from "./components/Myheader";
 import Nav from "./components/Nav";
 import MyArticle from "./components/MyArticle";
 import Controls from "./components/controls";
 import CreateArticle from "./components/createArticle";
-import { useState, useCallback } from "react";
 import UpdateArticle from "./components/UpdateArticle";
 
 function App() {
@@ -31,6 +31,20 @@ function App() {
   const [maxId, setMaxid] = useState(3);
   const welcome = { title: "welcome", desc: "Welcome to react" };
 
+  const handleChangeMode = useCallback(_id => {
+    setMode("read");
+    setId(_id);
+  }, []);
+
+  const handleDelete = () => {
+    if (window.confirm("정말 삭제할까요?")) {
+      setContent(prev => prev.filter(item => item.id !== id));
+      setMode("welcome");
+    } else {
+      setMode("welcome");
+    }
+  };
+
   let _title = null;
   let _desc = null;
   let _article = null;
@@ -51,6 +65,7 @@ function App() {
           onChangeMode={() => {
             setMode("update");
           }}
+          onDelete={handleDelete}
         />
       );
     }
@@ -75,20 +90,15 @@ function App() {
         title={selected.title}
         desc={selected.desc}
         onSubmit={(_title, _desc) => {
-          let _contents = content.map(c =>
-            c.id === id ? { ...c, title: _title, desc: _desc } : c,
+          setContent(prev =>
+            prev.map(p => (p.id === id ? { ...p, title: _title, desc: _desc } : p)),
           );
-          setContent(_contents);
           setMode("read");
         }}
       />
     );
   }
 
-  const handleChangeMode = useCallback(_id => {
-    setMode("read");
-    setId(_id);
-  }, []);
   return (
     <>
       <Myheader
