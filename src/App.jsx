@@ -4,7 +4,8 @@ import Nav from "./components/Nav";
 import MyArticle from "./components/MyArticle";
 import Controls from "./components/controls";
 import CreateArticle from "./components/createArticle";
-import { useState } from "react";
+import { useState, useCallback } from "react";
+import UpdateArticle from "./components/UpdateArticle";
 
 function App() {
   console.log("App render");
@@ -43,7 +44,15 @@ function App() {
     if (selected) {
       _title = selected.title;
       _desc = selected.desc;
-      _article = <MyArticle title={_title} desc={_desc} />;
+      _article = (
+        <MyArticle
+          title={_title}
+          desc={_desc}
+          onChangeMode={() => {
+            setMode("update");
+          }}
+        />
+      );
     }
   } else if (mode === "create") {
     _article = (
@@ -53,10 +62,33 @@ function App() {
           let _contents = content.concat({ id: newId, title: _title, desc: _desc });
           setContent(_contents);
           setMaxid(newId);
+          setId(newId);
+          setMode("read");
+        }}
+      />
+    );
+  } else if (mode === "update") {
+    const selected = content.find(c => c.id === id);
+    if (!selected) return null;
+    _article = (
+      <UpdateArticle
+        title={selected.title}
+        desc={selected.desc}
+        onSubmit={(_title, _desc) => {
+          let _contents = content.map(c =>
+            c.id === id ? { ...c, title: _title, desc: _desc } : c,
+          );
+          setContent(_contents);
+          setMode("read");
         }}
       />
     );
   }
+
+  const handleChangeMode = useCallback(_id => {
+    setMode("read");
+    setId(_id);
+  }, []);
   return (
     <>
       <Myheader
@@ -66,13 +98,7 @@ function App() {
           setMode("welcome");
         }}
       />
-      <Nav
-        data={content}
-        onChangeMode={_id => {
-          setMode("read");
-          setId(_id);
-        }}
-      />
+      <Nav data={content} onChangeMode={handleChangeMode} />
       {_article}
       <hr />
       <Controls
