@@ -7,7 +7,7 @@ function CreateArticle({ onSubmit }) {
         action=""
         onSubmit={e => {
           e.preventDefault();
-          onSubmit(e.target.title.value, e.target.desc.value);
+          onSubmit(e.target.title.value, e.target.desc.value, e.target.difficultyLevel.value);
         }}>
         <div>
           <label htmlFor="title">Title</label>
@@ -16,6 +16,17 @@ function CreateArticle({ onSubmit }) {
         <div>
           <label htmlFor="desc">Description</label>
           <textarea name="desc" id="desc"></textarea>
+        </div>
+        <div>
+          <label htmlFor="difficultyLevel">difficultyLevel</label>
+          <input
+            type="number"
+            name="difficultyLevel"
+            id="difficultyLevel"
+            min="1"
+            max="10"
+            defaultValue="1"
+          />
         </div>
         <button>Submit</button>
       </form>
