@@ -1,4 +1,5 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useMemo } from "react";
+import { v4 as uuidv4 } from "uuid";
 import "./App.css";
 import Myheader from "./components/Myheader";
 import Nav from "./components/Nav";
@@ -9,26 +10,25 @@ import UpdateArticle from "./components/UpdateArticle";
 
 function App() {
   console.log("App render");
-  const [id, setId] = useState(1);
+  const [id, setId] = useState("1");
   const [mode, setMode] = useState("welcome");
   const [subject, setSubject] = useState({
     title: "프론트엔드 개발자",
     desc: "기본언어인 html, css, javascript부터 학습합니다.",
   });
   const [content, setContent] = useState([
-    { id: 1, title: "UI/UX 개발", desc: "사용자 경험을 고려한 직관적이고 반응성 높은 화면 구현" },
+    { id: "1", title: "UI/UX 개발", desc: "사용자 경험을 고려한 직관적이고 반응성 높은 화면 구현" },
     {
-      id: 2,
+      id: "2",
       title: "재사용이 가능한 UI 개발",
       desc: "컴포넌트 기반으로 동일한 UI를 효율적으로 재사용 가능",
     },
     {
-      id: 3,
+      id: "3",
       title: "애니메이션 구현",
       desc: "상태 변화에 따른 자연스럽고 동적인 화면 효과 구현",
     },
   ]);
-  const [maxId, setMaxid] = useState(3);
   const welcome = { title: "welcome", desc: "Welcome to react" };
 
   const handleChangeMode = useCallback(_id => {
@@ -44,6 +44,7 @@ function App() {
       setMode("welcome");
     }
   };
+  const selectedArticle = useMemo(() => content.find(item => item.id === id), [content, id]);
 
   let _title = null;
   let _desc = null;
@@ -54,10 +55,9 @@ function App() {
     _desc = welcome.desc;
     _article = <MyArticle title={_title} desc={_desc} />;
   } else if (mode === "read") {
-    const selected = content.find(c => c.id === id);
-    if (selected) {
-      _title = selected.title;
-      _desc = selected.desc;
+    if (selectedArticle) {
+      _title = selectedArticle.title;
+      _desc = selectedArticle.desc;
       _article = (
         <MyArticle
           title={_title}
@@ -73,22 +73,20 @@ function App() {
     _article = (
       <CreateArticle
         onSubmit={(_title, _desc) => {
-          const newId = maxId + 1;
+          const newId = uuidv4();
           let _contents = content.concat({ id: newId, title: _title, desc: _desc });
           setContent(_contents);
-          setMaxid(newId);
           setId(newId);
           setMode("read");
         }}
       />
     );
   } else if (mode === "update") {
-    const selected = content.find(c => c.id === id);
-    if (!selected) return null;
+    if (!selectedArticle) return null;
     _article = (
       <UpdateArticle
-        title={selected.title}
-        desc={selected.desc}
+        title={selectedArticle.title}
+        desc={selectedArticle.desc}
         onSubmit={(_title, _desc) => {
           setContent(prev =>
             prev.map(p => (p.id === id ? { ...p, title: _title, desc: _desc } : p)),
