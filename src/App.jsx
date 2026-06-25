@@ -118,7 +118,7 @@ function App() {
           setMode("welcome");
         }}
       />
-      <Nav data={content} onChangeMode={handleChangeMode} />
+      <Nav id={id} data={content} onChangeMode={handleChangeMode} />
       {renderArticle()}
       <hr />
       <Controls
