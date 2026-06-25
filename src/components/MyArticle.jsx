@@ -1,4 +1,3 @@
-//Article 컴포넌트
 function MyArticle({ title, desc, difficultyLevel, onChangeMode, onDelete }) {
   console.log("MyArticle render");
   return (

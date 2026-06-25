@@ -1,4 +1,3 @@
-//Nav 컴포넌트
 import { memo } from "react";
 const Nav = memo(function Nav({ data, onChangeMode }) {
   console.log("Nav render");
@@ -6,16 +5,14 @@ const Nav = memo(function Nav({ data, onChangeMode }) {
     <li key={d.id}>
       <a
         href={`/${d.id}`}
-        data-id={d.id}
         onClick={e => {
           e.preventDefault();
-          onChangeMode(e.target.dataset.id);
+          onChangeMode(d.id);
         }}>
         {d.title}
       </a>
     </li>
   ));
-  //list에 출력할 코드 생성
   return (
     <nav>
       <ul>{lists}</ul>

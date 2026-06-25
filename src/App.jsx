@@ -12,10 +12,10 @@ function App() {
   console.log("App render");
   const [id, setId] = useState("1");
   const [mode, setMode] = useState("welcome");
-  const [subject, setSubject] = useState({
-    title: "프론트엔드 개발자",
-    desc: "기본언어인 html, css, javascript부터 학습합니다.",
-  });
+  // const [subject, setSubject] = useState({
+  //   title: "프론트엔드 개발자",
+  //   desc: "기본언어인 html, css, javascript부터 학습합니다.",
+  // });
   const [content, setContent] = useState([
     {
       id: "1",
@@ -36,7 +36,12 @@ function App() {
       difficultyLevel: 3,
     },
   ]);
+
   const welcome = { title: "welcome", desc: "Welcome to react" };
+  const subject = {
+    title: "프론트엔드 개발자",
+    desc: "기본언어인 html, css, javascript부터 학습합니다.",
+  };
 
   const handleChangeMode = useCallback(_id => {
     setMode("read");
@@ -46,76 +51,63 @@ function App() {
   const handleDelete = () => {
     if (window.confirm("정말 삭제할까요?")) {
       setContent(prev => prev.filter(item => item.id !== id));
-      setMode("welcome");
-    } else {
-      setMode("welcome");
     }
+    setMode("welcome");
   };
+
   const selectedArticle = useMemo(() => content.find(item => item.id === id), [content, id]);
 
-  let _title = null;
-  let _desc = null;
-  let _difficultyLevel = null;
-  let _article = null;
+  const handleSubmitCreate = (_title, _desc, _difficultyLevel) => {
+    const newId = uuidv4();
+    let _contents = content.concat({
+      id: newId,
+      title: _title,
+      desc: _desc,
+      difficultyLevel: _difficultyLevel,
+    });
+    setContent(_contents);
+    setId(newId);
+    setMode("read");
+  };
 
-  if (mode === "welcome") {
-    _title = welcome.title;
-    _desc = welcome.desc;
-    _article = <MyArticle title={_title} desc={_desc} />;
-  } else if (mode === "read") {
-    if (selectedArticle) {
-      _title = selectedArticle.title;
-      _desc = selectedArticle.desc;
-      _difficultyLevel = selectedArticle.difficultyLevel;
-      _article = (
-        <MyArticle
-          title={_title}
-          desc={_desc}
-          difficultyLevel={_difficultyLevel}
-          onChangeMode={() => {
-            setMode("update");
-          }}
-          onDelete={handleDelete}
-        />
-      );
+  const handleSubmitUpdate = (_title, _desc, _difficultyLevel) => {
+    setContent(prev =>
+      prev.map(p =>
+        p.id === id ? { ...p, title: _title, desc: _desc, difficultyLevel: _difficultyLevel } : p,
+      ),
+    );
+    setMode("read");
+  };
+
+  const renderArticle = () => {
+    switch (mode) {
+      case "read":
+        return (
+          <MyArticle
+            title={selectedArticle?.title ?? welcome.title}
+            desc={selectedArticle?.desc ?? welcome.desc}
+            difficultyLevel={selectedArticle?.difficultyLevel ?? welcome.difficultyLevel}
+            onChangeMode={() => {
+              setMode("update");
+            }}
+            onDelete={handleDelete}
+          />
+        );
+      case "create":
+        return <CreateArticle onSubmit={handleSubmitCreate} />;
+      case "update":
+        return (
+          <UpdateArticle
+            title={selectedArticle.title}
+            desc={selectedArticle.desc}
+            difficultyLevel={selectedArticle.difficultyLevel}
+            onSubmit={handleSubmitUpdate}
+          />
+        );
+      default:
+        return <MyArticle title={welcome.title} desc={welcome.desc} />;
     }
-  } else if (mode === "create") {
-    _article = (
-      <CreateArticle
-        onSubmit={(_title, _desc, _difficultyLevel) => {
-          const newId = uuidv4();
-          let _contents = content.concat({
-            id: newId,
-            title: _title,
-            desc: _desc,
-            difficultyLevel: _difficultyLevel,
-          });
-          setContent(_contents);
-          setId(newId);
-          setMode("read");
-        }}
-      />
-    );
-  } else if (mode === "update") {
-    if (!selectedArticle) return null;
-    _article = (
-      <UpdateArticle
-        title={selectedArticle.title}
-        desc={selectedArticle.desc}
-        difficultyLevel={selectedArticle.difficultyLevel}
-        onSubmit={(_title, _desc, _difficultyLevel) => {
-          setContent(prev =>
-            prev.map(p =>
-              p.id === id
-                ? { ...p, title: _title, desc: _desc, difficultyLevel: _difficultyLevel }
-                : p,
-            ),
-          );
-          setMode("read");
-        }}
-      />
-    );
-  }
+  };
 
   return (
     <>
@@ -127,7 +119,7 @@ function App() {
         }}
       />
       <Nav data={content} onChangeMode={handleChangeMode} />
-      {_article}
+      {renderArticle()}
       <hr />
       <Controls
         onChangeMode={() => {
